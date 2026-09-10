@@ -1,0 +1,5 @@
+@media (max-width: 760px) {
+  .container { padding: 0 20px; }
+  .leaf { padding: 44px 0 56px; }
+  .talk-btn { display: none; }
+}

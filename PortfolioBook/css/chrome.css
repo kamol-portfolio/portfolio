@@ -1,0 +1,205 @@
+/* ==========================================================================
+   BOOK SHELL
+   ========================================================================== */
+
+.book { min-height: 100vh; display: flex; flex-direction: column; }
+
+/* ---- header ------------------------------------------------------------- */
+.book-header {
+  height: var(--header-h);
+  flex: 0 0 auto;
+  background: var(--cover-bg);
+  color: var(--cover-text);
+  border-bottom: 1px solid var(--cover-line);
+  position: sticky; top: 0; z-index: 50;
+}
+.book-header .container {
+  height: 100%;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  max-width: 1180px;
+}
+.book-title {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.book-title small {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  color: var(--cover-text-dim);
+  letter-spacing: .02em;
+  margin-top: 1px;
+}
+.header-actions { display: flex; align-items: center; gap: 14px; flex: 0 0 auto; }
+.contents-btn {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  color: var(--cover-text-dim);
+}
+.contents-btn:hover { color: var(--cover-text); }
+.talk-btn {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--cover-bg);
+  background: var(--ochre);
+  padding: 7px 13px;
+}
+.talk-btn:hover { background: #C79738; }
+
+/* ---- index tabs (protrude like divider tabs from the page edge) --------- */
+.index-tabs {
+  flex: 0 0 auto;
+  background: var(--cover-bg-alt);
+  border-bottom: 1px solid var(--cover-line);
+  position: sticky; top: var(--header-h); z-index: 45;
+}
+.index-tabs .tab-scroll {
+  max-width: 1180px;
+  margin: 0 auto;
+  display: flex;
+  gap: 3px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 0 20px;
+}
+.index-tabs .tab-scroll::-webkit-scrollbar { display: none; }
+
+.idx-tab {
+  flex: 0 0 auto;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--cover-text-dim);
+  padding: 10px 14px 8px;
+  border-bottom: 3px solid transparent;
+  white-space: nowrap;
+  transition: color .15s var(--ease), border-color .15s var(--ease);
+}
+.idx-tab .idx-n { color: var(--ochre); margin-right: 6px; }
+.idx-tab:hover { color: var(--cover-text); }
+.idx-tab.is-active { color: var(--cover-text); border-color: var(--ochre); }
+
+/* ---- page frame: ruled paper + red margin rule --------------------------- */
+.page-frame {
+  flex: 1 1 auto;
+  position: relative;
+  background:
+    linear-gradient(var(--rule) 1px, transparent 1px) 0 0 / 100% 34px,
+    var(--paper);
+}
+.page-frame::before {
+  content: '';
+  position: absolute; top: 0; bottom: 0;
+  left: 64px;
+  width: 1px;
+  background: var(--margin-rule);
+  opacity: .35;
+  z-index: 1;
+  pointer-events: none;
+}
+@media (max-width: 760px) {
+  .page-frame::before { left: 28px; }
+}
+
+.page-stack {
+  position: relative;
+  perspective: 2200px;
+  min-height: calc(100vh - var(--header-h) - 44px - var(--pagination-h));
+}
+
+.page {
+  display: none;
+  position: relative;
+  z-index: 2;
+}
+.page.is-active { display: block; }
+
+/* page-turn animation: outgoing leaf lifts away, incoming leaf settles in */
+.page.is-turning-out-next {
+  display: block;
+  position: absolute; inset: 0;
+  animation: turn-out-next .42s var(--ease) forwards;
+  transform-origin: left center;
+}
+.page.is-turning-out-prev {
+  display: block;
+  position: absolute; inset: 0;
+  animation: turn-out-prev .42s var(--ease) forwards;
+  transform-origin: right center;
+}
+.page.is-turning-in-next {
+  display: block;
+  animation: turn-in-next .42s var(--ease) .1s both;
+  transform-origin: right center;
+}
+.page.is-turning-in-prev {
+  display: block;
+  animation: turn-in-prev .42s var(--ease) .1s both;
+  transform-origin: left center;
+}
+
+@keyframes turn-out-next {
+  from { transform: rotateY(0deg) translateX(0); opacity: 1; }
+  to   { transform: rotateY(-18deg) translateX(-3%); opacity: 0; }
+}
+@keyframes turn-out-prev {
+  from { transform: rotateY(0deg) translateX(0); opacity: 1; }
+  to   { transform: rotateY(18deg) translateX(3%); opacity: 0; }
+}
+@keyframes turn-in-next {
+  from { transform: rotateY(14deg) translateX(3%); opacity: 0; }
+  to   { transform: rotateY(0deg) translateX(0); opacity: 1; }
+}
+@keyframes turn-in-prev {
+  from { transform: rotateY(-14deg) translateX(-3%); opacity: 0; }
+  to   { transform: rotateY(0deg) translateX(0); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .page.is-turning-out-next, .page.is-turning-out-prev,
+  .page.is-turning-in-next, .page.is-turning-in-prev { animation: none; }
+}
+
+/* stack-of-pages shadow along the right edge, suggesting leaves behind */
+.page-frame::after {
+  content: '';
+  position: absolute; top: 0; right: 0; bottom: 0;
+  width: 10px;
+  background:
+    repeating-linear-gradient(90deg,
+      rgba(0,0,0,0.05) 0, rgba(0,0,0,0.05) 1px,
+      transparent 1px, transparent 3px);
+  opacity: .5;
+  pointer-events: none;
+}
+
+/* ---- pagination ----------------------------------------------------------- */
+.pagination {
+  flex: 0 0 auto;
+  height: var(--pagination-h);
+  background: var(--cover-bg);
+  border-top: 1px solid var(--cover-line);
+  position: sticky; bottom: 0; z-index: 50;
+}
+.pagination .container {
+  height: 100%;
+  display: flex; align-items: center; justify-content: center; gap: 22px;
+  max-width: 1180px;
+}
+.page-nav-btn {
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--cover-text-dim);
+  padding: 8px 6px;
+}
+.page-nav-btn:hover:not([disabled]) { color: var(--cover-text); }
+.page-nav-btn[disabled] { opacity: .3; cursor: default; }
+.page-nav-btn .chev { font-size: 1rem; }
+
+.folio-counter {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--cover-text);
+  letter-spacing: .03em;
+}
+.folio-counter span { color: var(--ochre); }
